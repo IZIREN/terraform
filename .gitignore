@@ -2,6 +2,8 @@ osrc.sh
 .idea
 *.tfstate
 *.tfstate.backup
+*.tfstate.lock
+*.tfstate.lock.info
 *openrc*.sh
 .envrc
 

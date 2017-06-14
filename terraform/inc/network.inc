@@ -70,7 +70,7 @@
         <% if exists?("net_cidr") %>
             addresses = ["<%= net_cidr %>"]
         <% else %>
-            addresses = ["10.17.3.0/24"]
+            addresses = ["10.17.2.0/23"]
         <% end %>
     }
 

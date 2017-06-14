@@ -14,6 +14,9 @@
         <% end %>
 
         hostname       = "<%= hostname %>"
+        <% if !exists?("net_cidr") %>
+            addresses      = ["10.17.3.${count.index}"]
+        <% end %>
         wait_for_lease = 1
     }
 
