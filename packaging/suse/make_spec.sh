@@ -3,7 +3,7 @@
 if [ -z "$1" ]; then
   cat <<EOF
 usage:
-  ./make_spec.sh PACKAGE
+  ./make_spec.sh PACKAGE [BRANCH]
 EOF
   exit 1
 fi
@@ -16,6 +16,7 @@ COMMIT_UNIX_TIME=$(git show -s --format=%ct)
 VERSION="${VERSION%+*}+$(date -d @$COMMIT_UNIX_TIME +%Y%m%d).$(git rev-parse --short HEAD)"
 NAME=$1
 GITREPONAME=$(basename `git rev-parse --show-toplevel`)
+BRANCH=${2:-master}
 
 cat <<EOF > ${NAME}.spec
 #
@@ -45,7 +46,7 @@ Summary:        Production-Grade Container Scheduling and Management
 License:        Apache-2.0
 Group:          System/Management
 Url:            http://kubernetes.io
-Source:         master.tar.gz
+Source:         ${BRANCH}.tar.gz
 BuildRequires:  systemd-rpm-macros
 Requires:       terraform
 
@@ -53,14 +54,14 @@ Requires:       terraform
 Terraforms preprocessor and scripts for deploying a Kubernetes cluster
 
 %prep
-%setup -q -n $GITREPONAME-master
+%setup -q -n $GITREPONAME-$BRANCH
 
 %build
 
 %install
 rm -rf %{buildroot}%{_datadir}
 mkdir -p %{buildroot}%{_datadir}/terraform/kubernetes
-cp -R %{_builddir}/terraform-master/*  %{buildroot}%{_datadir}/terraform/kubernetes/
+cp -R %{_builddir}/terraform-$BRANCH/*  %{buildroot}%{_datadir}/terraform/kubernetes/
 
 %files
 %defattr(-,root,root)
