@@ -17,6 +17,7 @@ VERSION="${VERSION%+*}+$(date -d @$COMMIT_UNIX_TIME +%Y%m%d).$(git rev-parse --s
 NAME=$1
 GITREPONAME=$(basename `git rev-parse --show-toplevel`)
 BRANCH=${2:-master}
+SAFE_BRANCH=${BRANCH//\//-}
 
 cat <<EOF > ${NAME}.spec
 #
@@ -46,7 +47,7 @@ Summary:        Production-Grade Container Scheduling and Management
 License:        Apache-2.0
 Group:          System/Management
 Url:            http://kubernetes.io
-Source:         ${BRANCH}.tar.gz
+Source:         ${SAFE_BRANCH}.tar.gz
 BuildRequires:  systemd-rpm-macros
 Requires:       terraform
 
@@ -54,14 +55,14 @@ Requires:       terraform
 Terraforms preprocessor and scripts for deploying a Kubernetes cluster
 
 %prep
-%setup -q -n $GITREPONAME-$BRANCH
+%setup -q -n $GITREPONAME-$SAFE_BRANCH
 
 %build
 
 %install
 rm -rf %{buildroot}%{_datadir}
 mkdir -p %{buildroot}%{_datadir}/terraform/kubernetes
-cp -R %{_builddir}/terraform-$BRANCH/*  %{buildroot}%{_datadir}/terraform/kubernetes/
+cp -R %{_builddir}/terraform-$SAFE_BRANCH/*  %{buildroot}%{_datadir}/terraform/kubernetes/
 
 %files
 %defattr(-,root,root)
