@@ -204,12 +204,34 @@ fi
 if [ "$1" != "apply" ]; then
     exit $?
 fi
+if command -v jq; then
+    echo "Generating environment.json file"
+    environment=$(cat terraform.tfstate | \
+        jq ".modules[].resources[] "`
+            `"| select(.type==\"libvirt_domain\") | .primary | .attributes | "`
+                `"{fqdn: .metadata | split(\",\") | .[0], "`
+                `"ipv4: .[\"network_interface.0.addresses.0\"],"`
+                `"id: .metadata | split(\",\") | .[1] | tonumber,"`
+                `"role: (if (.metadata | split(\",\") | .[1] | tonumber) == 0 then \"master\" else \"worker\" end)}" \
+            | jq -s . | jq "{minions: .}")
+
+    for node in $(echo "$environment" | jq -r '.minions[] | select(.["minion_id"]? == null) | [.ipv4] | join(" ")'); do
+        machine_id=$(ssh root@$node -i ssh/id_docker  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no cat /etc/machine-id)
+        environment=$(echo "$environment" | jq ".minions | map(if (.ipv4 == \"$node\") then . + {\"minionID\": \"$machine_id\"} else . end) | {minions: .}")
+    done
+    environment=$(echo "$environment" | jq " . + {dashboardHost: \"$DASHBOARD_HOST\", kubernetesHost: .minions[] | select(.role==\"master\") | .ipv4}")
+    environment=$(echo "$environment" | jq " . + {sshKey: \"`pwd`/ssh/id_docker\", sshUser: \"root\"}")
+    echo "$environment" | tee environment.json
+else
+    echo "jq is not installed - please install jq to generate the environment.json file"
+fi
 
 if which notify-send >/dev/null; then
     notify-send "The infrastructure is up, running Salt!"
 else
     echo "The infrastructure is up, running Salt!"
 fi
+
 
 if [ $SKIP_ORCHESTRATION == "false" ] && [ $SKIP_DASHBOARD == "false" ]; then
     ssh -i ssh/id_docker \
