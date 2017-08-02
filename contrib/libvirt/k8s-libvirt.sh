@@ -62,14 +62,14 @@ fi
 
 # Select the correct CaaSP base URL
 if [ "$FLAVOUR" == "caasp" ]; then
-    # Release/Staging does not yet exist for 2.0
-    # if [ "$STAGING" == "release" ]; then
-    #     CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10/images/"
+    # Staging images do not yet exist for 2.0
+    if [ "$STAGING" == "release" ]; then
+        CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP3:/Update:/Products:/CASP20/images/"
     # elif [ "$STAGING" == "staging_a" ]; then
     #     CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10:/Staging:/A/images/"
     # elif [ "$STAGING" == "staging_b" ]; then
     #     CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10:/Staging:/B/images/"
-    if [ "$STAGING" == "devel" ]; then
+    elif [ "$STAGING" == "devel" ]; then
         CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/Devel:/CASP:/Head:/ControllerNode/images/"
     else
         echo "[+] ERROR: Unknown CaaSP image: ${STAGING}"
@@ -90,7 +90,7 @@ if [ "$1" == "apply" ]; then
     if [ "$FLAVOUR" == "opensuse" ]; then
         IMAGE_PATH="${IMAGE_PATH:-$PWD/Base-openSUSE-Leap-42.2.x86_64-cloud_ext4.qcow2}"
     elif [ "$FLAVOUR" == "caasp" ]; then
-        IMAGE_PATH="${IMAGE_PATH:-$PWD/SUSE-CaaS-Platform-1.0-KVM-and-Xen.${STAGING}.x86_64.qcow2}"
+        IMAGE_PATH="${IMAGE_PATH:-$PWD/SUSE-CaaS-Platform-KVM-and-Xen.${STAGING}.x86_64.qcow2}"
     fi
 
     NEED_UPDATE=false
@@ -103,8 +103,8 @@ if [ "$1" == "apply" ]; then
             wget $WGET_FLAGS -O "$IMAGE_PATH.sha256.remote" -N "http://download.opensuse.org/repositories/Virtualization:/containers:/images:/KVM:/Leap:/42.2/images/Base-openSUSE-Leap-42.2.x86_64-cloud_ext4.qcow2.sha256"
         elif [ "$FLAVOUR" == "caasp" ]; then
             echo "[+] Downloading SUSE CaaSP qcow2 VM image sha to '$IMAGE_PATH.sha256.remote'"
-            wget $WGET_FLAGS -r -l1 -nd -N $CAASP_IMAGE_BASE_URL -P /tmp/CaaSP -A "SUSE-CaaS-Platform-1.0-KVM-and-Xen.x86_64-*qcow2.sha256"
-            find /tmp/CaaSP -name "SUSE-CaaS-Platform-1.0-KVM-and-Xen.x86_64*qcow2.sha256" -prune -exec mv {} $IMAGE_PATH.sha256.remote ';'
+            wget $WGET_FLAGS -r -l1 -nd -N $CAASP_IMAGE_BASE_URL -P /tmp/CaaSP -A "SUSE-CaaS-Platform-*-KVM-and-Xen.x86_64-*qcow2.sha256"
+            find /tmp/CaaSP -name "SUSE-CaaS-Platform-*-KVM-and-Xen.x86_64*qcow2.sha256" -prune -exec mv {} $IMAGE_PATH.sha256.remote ';'
         fi
 
         LOCAL_SHA="$IMAGE_PATH.sha256"
@@ -144,10 +144,10 @@ if [ "$1" == "apply" ]; then
                 wget $WGET_FLAGS -O "$IMAGE_PATH.sha256" -N "http://download.opensuse.org/repositories/Virtualization:/containers:/images:/KVM:/Leap:/42.2/images/Base-openSUSE-Leap-42.2.x86_64-cloud_ext4.qcow2.sha256"
             elif [ "$FLAVOUR" == "caasp" ]; then
                 echo "[+] Downloading SUSE CaaSP qcow2 VM image to '$IMAGE_PATH'"
-                wget $WGET_FLAGS -r -l1 -nd -N $CAASP_IMAGE_BASE_URL -P /tmp/CaaSP -A "SUSE-CaaS-Platform-1.0-KVM-and-Xen.x86_64-*qcow2"
-                wget $WGET_FLAGS -r -l1 -nd -N $CAASP_IMAGE_BASE_URL -P /tmp/CaaSP -A "SUSE-CaaS-Platform-1.0-KVM-and-Xen.x86_64-*qcow2.sha256"
-                find /tmp/CaaSP -name "SUSE-CaaS-Platform-1.0-KVM-and-Xen.x86_64*qcow2" -prune -exec mv {} $IMAGE_PATH ';'
-                find /tmp/CaaSP -name "SUSE-CaaS-Platform-1.0-KVM-and-Xen.x86_64*qcow2.sha256" -prune -exec mv {} $IMAGE_PATH.sha256 ';'
+                wget $WGET_FLAGS -r -l1 -nd -N $CAASP_IMAGE_BASE_URL -P /tmp/CaaSP -A "SUSE-CaaS-Platform-*-KVM-and-Xen.x86_64-*qcow2"
+                wget $WGET_FLAGS -r -l1 -nd -N $CAASP_IMAGE_BASE_URL -P /tmp/CaaSP -A "SUSE-CaaS-Platform-*-KVM-and-Xen.x86_64-*qcow2.sha256"
+                find /tmp/CaaSP -name "SUSE-CaaS-Platform-*-KVM-and-Xen.x86_64*qcow2" -prune -exec mv {} $IMAGE_PATH ';'
+                find /tmp/CaaSP -name "SUSE-CaaS-Platform-*-KVM-and-Xen.x86_64*qcow2.sha256" -prune -exec mv {} $IMAGE_PATH.sha256 ';'
             fi
         fi
     else
