@@ -18,7 +18,7 @@ DASHBOARD_MEMORY=${DASHBOARD_MEMORY:-2048}
 MASTER_MEMORY=${MASTER_MEMORY:-2048}
 MINION_MEMORY=${MINION_MEMORY:-2048}
 FLAVOUR=${FLAVOUR:-"caasp"}
-STAGING=${STAGING:-"release"}
+STAGING=${STAGING:-"devel"}
 DASHBOARD_HOST=${DASHBOARD_HOST:-}
 SKIP_DASHBOARD=${SKIP_DASHBOARD:-"false"}
 SKIP_ORCHESTRATION=${SKIP_ORCHESTRATION:-"false"}
@@ -62,14 +62,15 @@ fi
 
 # Select the correct CaaSP base URL
 if [ "$FLAVOUR" == "caasp" ]; then
-    if [ "$STAGING" == "release" ]; then
-        CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10/images/"
-    elif [ "$STAGING" == "staging_a" ]; then
-        CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10:/Staging:/A/images/"
-    elif [ "$STAGING" == "staging_b" ]; then
-        CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10:/Staging:/B/images/"
-    elif [ "$STAGING" == "devel" ]; then
-        CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/Devel:/CASP:/1.0:/ControllerNode/images/"
+    # Release/Staging does not yet exist for 2.0
+    # if [ "$STAGING" == "release" ]; then
+    #     CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10/images/"
+    # elif [ "$STAGING" == "staging_a" ]; then
+    #     CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10:/Staging:/A/images/"
+    # elif [ "$STAGING" == "staging_b" ]; then
+    #     CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10:/Staging:/B/images/"
+    if [ "$STAGING" == "devel" ]; then
+        CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/Devel:/CASP:/Head:/ControllerNode/images/"
     else
         echo "[+] ERROR: Unknown CaaSP image: ${STAGING}"
         exit 1
