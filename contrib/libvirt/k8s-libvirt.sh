@@ -211,6 +211,7 @@ if command -v jq; then
             `"| select(.type==\"libvirt_domain\") | .primary | .attributes | "`
                 `"{fqdn: .metadata | split(\",\") | .[0], "`
                 `"ipv4: .[\"network_interface.0.addresses.0\"],"`
+                `"addresses: {publicIpv4: .[\"network_interface.0.addresses.0\"], privateIpv4: .[\"network_interface.0.addresses.0\"]},"`
                 `"id: .metadata | split(\",\") | .[1] | tonumber,"`
                 `"role: (if (.metadata | split(\",\") | .[1] | tonumber) == 0 then \"master\" else \"worker\" end)}" \
             | jq -s . | jq "{minions: .}")
