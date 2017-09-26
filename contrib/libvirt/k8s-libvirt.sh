@@ -70,7 +70,7 @@ if [ "$FLAVOUR" == "caasp" ]; then
     # elif [ "$STAGING" == "staging_b" ]; then
     #     CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10:/Staging:/B/images/"
     elif [ "$STAGING" == "devel" ]; then
-        CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/Devel:/CASP:/Head:/ControllerNode/images/"
+        CAASP_IMAGE_BASE_URL="http://download.suse.de/ibs/Devel:/CASP:/2.0:/ControllerNode/images/"
     else
         echo "[+] ERROR: Unknown CaaSP image: ${STAGING}"
         exit 1
